@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -6,39 +6,38 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
-import emailjs from '@emailjs/browser';
+import { MapPin, Phone, Clock } from "lucide-react";
+
+const initialFormState = {
+  name: "",
+  email: "",
+  phone: "",
+  message: "",
+};
 
 const Contact = () => {
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState(initialFormState);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     try {
-      const result = await emailjs.send(
-        'SROEPGES_EmailJS_Service_ID',
-        'SROEPGES_EmailJS_Template_ID',
-        {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          message: formData.message,
-        },
-        'SROEPGES_EmailJS_Public_Key'
-      );
+      const response = await fetch("/.netlify/functions/send-contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
 
       toast({
         title: "Nachricht gesendet!",
         description: "Wir werden uns in Kürze bei Ihnen melden.",
       });
-      setFormData({ name: "", email: "", phone: "", message: "" });
+      setFormData(initialFormState);
     } catch (error) {
       toast({
         title: "Fehler beim Senden",
