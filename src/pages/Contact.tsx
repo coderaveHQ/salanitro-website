@@ -93,8 +93,8 @@ const Contact = () => {
                       <div>
                         <h3 className="font-semibold mb-1">Kontakt</h3>
                         <p className="text-muted-foreground">
-                          Phone: +49 (0) 177-7821020<br />
-                          Email: goldschmiede@salanitro.de
+                          Telefon: +49 (0) 177-7821020<br />
+                          E-Mail: goldschmiede@salanitro.de
                         </p>
                       </div>
                     </div>
