@@ -5,6 +5,7 @@ const {
   EMAILJS_TEMPLATE_ID,
   EMAILJS_PUBLIC_KEY,
   EMAILJS_PRIVATE_KEY,
+  EMAILJS_ORIGIN,
 } = process.env;
 
 const EMAILJS_ENDPOINT = "https://api.emailjs.com/api/v1.0/email/send";
@@ -34,10 +35,17 @@ export const handler: Handler = async (event) => {
 
   try {
     const payload = JSON.parse(event.body ?? "{}");
+    const origin =
+      event.headers.origin ||
+      EMAILJS_ORIGIN ||
+      "https://salanitro.de";
 
     const response = await fetch(EMAILJS_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        origin,
+      },
       body: JSON.stringify({
         service_id: EMAILJS_SERVICE_ID,
         template_id: EMAILJS_TEMPLATE_ID,
