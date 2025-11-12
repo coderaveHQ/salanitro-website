@@ -1,6 +1,12 @@
 import type { Handler } from "@netlify/functions";
 
-const { EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY } = process.env;
+const {
+  EMAILJS_SERVICE_ID,
+  EMAILJS_TEMPLATE_ID,
+  EMAILJS_PUBLIC_KEY,
+  EMAILJS_PRIVATE_KEY,
+} = process.env;
+
 const EMAILJS_ENDPOINT = "https://api.emailjs.com/api/v1.0/email/send";
 
 export const handler: Handler = async (event) => {
@@ -12,8 +18,13 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
-    console.error("EmailJS environment variables are not configured.");
+  if (
+    !EMAILJS_SERVICE_ID ||
+    !EMAILJS_TEMPLATE_ID ||
+    !EMAILJS_PUBLIC_KEY ||
+    !EMAILJS_PRIVATE_KEY
+  ) {
+    console.error("EmailJS environment variables are not fully configured.");
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
@@ -31,6 +42,7 @@ export const handler: Handler = async (event) => {
         service_id: EMAILJS_SERVICE_ID,
         template_id: EMAILJS_TEMPLATE_ID,
         user_id: EMAILJS_PUBLIC_KEY,
+        accessToken: EMAILJS_PRIVATE_KEY,
         template_params: {
           name: payload.name,
           email: payload.email,
@@ -46,7 +58,7 @@ export const handler: Handler = async (event) => {
       return {
         statusCode: 502,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Failed to send email" }),
+        body: JSON.stringify({ error: errorText || "Failed to send email" }),
       };
     }
 
